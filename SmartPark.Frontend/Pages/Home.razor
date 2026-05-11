@@ -1,0 +1,106 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
+@using SmartPark.Frontend.Models
+@using SmartPark.Frontend.Services
+@inject ParkingSpaceService ParkingSpaceService
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+<div class="dashboard">
+    <h1>Dashboard</h1>
+
+    @if (spaces == null)
+    {
+        <div class="loading">Loading dashboard data...</div>
+    }
+    else
+    {
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">@TotalSpaces</div>
+                <div class="stat-label">Total Spaces</div>
+            </div>
+            <div class="stat-card free">
+                <div class="stat-value">@FreeSpaces</div>
+                <div class="stat-label">Free</div>
+            </div>
+            <div class="stat-card occupied">
+                <div class="stat-value">@OccupiedSpaces</div>
+                <div class="stat-label">Occupied</div>
+            </div>
+            <div class="stat-card reserved">
+                <div class="stat-value">@ReservedSpaces</div>
+                <div class="stat-label">Reserved</div>
+            </div>
+            <div class="stat-card occupancy">
+                <div class="stat-value">@OccupancyPercentage%</div>
+                <div class="stat-label">Occupancy</div>
+            </div>
+        </div>
+
+        <div class="recent-spaces">
+            <h2>Recent Parking Spaces</h2>
+            @if (spaces.Items.Any())
+            {
+                <div class="spaces-grid">
+                    @foreach (var space in spaces.Items)
+                    {
+                        <div class="space-card @GetStatusClass(space.Status)" @onclick="() => GoToSpaceDetails(space.Id)">
+                            <div class="space-number">@space.SpaceNumber</div>
+                            <div class="space-status">@space.Status</div>
+                            <div class="space-type">@space.Type</div>
+                            <div class="space-rate">@space.HourlyRate RON/hour</div>
+                            <div class="space-updated">Updated @GetTimeAgo(space.LastDetectedAt)</div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private PaginatedParkingSpacesDto? spaces;
+
+    private int TotalSpaces => spaces?.TotalCount ?? 0;
+    private int FreeSpaces => allSpaces?.Count(s => s.Status.ToLower() == "free") ?? 0;
+    private int OccupiedSpaces => allSpaces?.Count(s => s.Status.ToLower() == "occupied") ?? 0;
+    private int ReservedSpaces => allSpaces?.Count(s => s.Status.ToLower() == "reserved") ?? 0;
+    private string OccupancyPercentage => TotalSpaces > 0
+        ? ((OccupiedSpaces + ReservedSpaces) * 100.0 / TotalSpaces).ToString("F1")
+        : "0.0";
+
+    private List<ParkingSpaceDto>? allSpaces;
+
+    protected override async Task OnInitializedAsync()
+    {
+        spaces = await ParkingSpaceService.GetAllParkingSpacesAsync(1, 15);
+
+        // fetch all for accurate stats
+        var all = await ParkingSpaceService.GetAllParkingSpacesAsync(1, 1000);
+        allSpaces = all?.Items;
+    }
+
+    private string GetStatusClass(string status) => status.ToLower() switch
+    {
+        "free" => "free",
+        "occupied" => "occupied",
+        "reserved" => "reserved",
+        _ => "unknown"
+    };
+
+    private string GetTimeAgo(DateTime? dateTime)
+    {
+        if (dateTime == null) return "never";
+        var timeSpan = DateTime.UtcNow - dateTime.Value;
+        if (timeSpan.TotalSeconds < 60) return "just now";
+        if (timeSpan.TotalMinutes < 60) return $"{(int)timeSpan.TotalMinutes}m ago";
+        if (timeSpan.TotalHours < 24) return $"{(int)timeSpan.TotalHours}h ago";
+        return $"{(int)timeSpan.TotalDays}d ago";
+    }
+
+    private void GoToSpaceDetails(Guid id)
+    {
+        Navigation.NavigateTo($"/space/{id}");
+    }
+}

@@ -1,0 +1,195 @@
+@page "/reservations"
+@using Microsoft.AspNetCore.Authorization
+@using SmartPark.Frontend.Models
+@using SmartPark.Frontend.Services
+@inject AuthService AuthService
+@inject ReservationService ReservationService
+@inject ParkingSpaceService ParkingSpaceService
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+<div class="dashboard">
+    @if (!AuthService.IsAuthenticated)
+    {
+        <div class="no-data">Please <a href="/login">sign in</a> to view your reservations.</div>
+    }
+    else
+    {
+        <div class="section-header">
+            <h1>My Reservations</h1>
+            <button class="btn-primary" style="width:auto;padding:0.5rem 1.25rem;" @onclick="() => showForm = !showForm">
+                @(showForm ? "Cancel" : "+ New Reservation")
+            </button>
+        </div>
+
+        @if (showForm)
+        {
+            <div class="detail-card" style="margin-bottom:1.5rem;">
+                <h2>New Reservation</h2>
+
+                @if (!string.IsNullOrEmpty(formError))
+                {
+                    <div class="error-message" style="margin-bottom:1rem;">@formError</div>
+                }
+
+                <div class="details-grid">
+                    <div class="form-group">
+                        <label>Parking Space</label>
+                        <select @bind="selectedSpaceId">
+                            <option value="">-- Select Space --</option>
+                            @if (spaces != null)
+                            {
+                                @foreach (var space in spaces.Where(s => s.Status.ToLower() == "free"))
+                                {
+                                    <option value="@space.Id">@space.SpaceNumber — @space.Type (@space.HourlyRate RON/h)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="datetime-local" @bind="startTime" />
+                    </div>
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <input type="datetime-local" @bind="endTime" />
+                    </div>
+                </div>
+
+                @if (selectedSpaceId != "" && startTime != default && endTime != default && endTime > startTime)
+                {
+                    var hours = (endTime - startTime).TotalHours;
+                    var space = spaces?.FirstOrDefault(s => s.Id.ToString() == selectedSpaceId);
+                    if (space != null)
+                    {
+                        <p style="margin-bottom:1rem;color:var(--color-text-muted);font-size:0.85rem;">
+                            Estimated total: <strong style="color:var(--color-text);">@((hours * (double)space.HourlyRate).ToString("F2")) RON</strong>
+                            for @hours.ToString("F1") hours
+                        </p>
+                    }
+                }
+
+                <button class="btn-primary" style="width:auto;padding:0.6rem 1.5rem;" @onclick="CreateReservation" disabled="@isSubmitting">
+                    @(isSubmitting ? "Creating..." : "Confirm Reservation")
+                </button>
+            </div>
+        }
+
+        @if (reservations == null)
+        {
+            <div class="loading">Loading reservations...</div>
+        }
+        else if (!reservations.Any())
+        {
+            <div class="no-data">You have no reservations yet.</div>
+        }
+        else
+        {
+            <div class="reservations-list">
+                @foreach (var r in reservations.OrderByDescending(r => r.Interval.Start))
+                {
+                    <div class="reservation-item">
+                        <div>
+                            <div style="font-size:0.85rem;color:var(--color-text);margin-bottom:0.25rem;">
+                                @r.SpaceNumber
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--color-text-muted);">
+                                @r.Interval.Start.ToString("dd MMM yyyy HH:mm") → @r.Interval.End.ToString("dd MMM yyyy HH:mm")
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                            <span style="font-size:0.85rem;color:var(--color-text);">@r.TotalPrice.ToString("F2") RON</span>
+                            <div class="reservation-status">@r.Status</div>
+                            @if (r.Status.ToLower() == "pending" || r.Status.ToLower() == "confirmed")
+                            {
+                                <button class="btn-logout" @onclick="() => CancelReservation(r.Id)">Cancel</button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<ReservationDto>? reservations;
+    private List<ParkingSpaceDto>? spaces;
+    private bool showForm = false;
+    private bool isSubmitting = false;
+    private string formError = "";
+
+    private string selectedSpaceId = "";
+    private DateTime startTime = DateTime.Now.AddHours(1);
+    private DateTime endTime = DateTime.Now.AddHours(2);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthService.IsAuthenticated)
+            return;
+
+        var userId = AuthService.CurrentUser!.Id;
+        reservations = await ReservationService.GetUserReservationsAsync(userId);
+
+        var all = await ParkingSpaceService.GetAllParkingSpacesAsync(1, 1000);
+        spaces = all?.Items;
+    }
+
+    private async Task CreateReservation()
+    {
+        formError = "";
+
+        if (string.IsNullOrEmpty(selectedSpaceId))
+        {
+            formError = "Please select a parking space.";
+            return;
+        }
+        if (endTime <= startTime)
+        {
+            formError = "End time must be after start time.";
+            return;
+        }
+
+        isSubmitting = true;
+
+        var space = spaces?.FirstOrDefault(s => s.Id.ToString() == selectedSpaceId);
+        var hours = (endTime - startTime).TotalHours;
+        var totalPrice = space != null ? (decimal)hours * space.HourlyRate : 0;
+
+        var request = new CreateReservationDto
+        {
+            ParkingSpaceId = Guid.Parse(selectedSpaceId),
+            UserId = Guid.Parse(AuthService.CurrentUser!.Id),
+            Interval = new DateTimeRangeDto
+            {
+                Start = startTime.ToUniversalTime(),
+                End = endTime.ToUniversalTime()
+            },
+            TotalPrice = totalPrice
+        };
+
+        var success = await ReservationService.CreateReservationAsync(request);
+        if (success)
+        {
+            showForm = false;
+            var userId = AuthService.CurrentUser!.Id;
+            reservations = await ReservationService.GetUserReservationsAsync(userId);
+        }
+        else
+        {
+            formError = "Failed to create reservation. The space may already be reserved for this time.";
+        }
+
+        isSubmitting = false;
+    }
+    
+    private async Task CancelReservation(Guid reservationId)
+    {
+        var success = await ReservationService.CancelReservationAsync(reservationId);
+        if (success)
+        {
+            var userId = AuthService.CurrentUser!.Id;
+            reservations = await ReservationService.GetUserReservationsAsync(userId);
+        }
+    }
+}

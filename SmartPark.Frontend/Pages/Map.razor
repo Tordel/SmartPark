@@ -1,0 +1,81 @@
+@page "/map"
+@using Microsoft.AspNetCore.Authorization
+@using SmartPark.Frontend.Models
+@using SmartPark.Frontend.Services
+@inject ParkingSpaceService ParkingSpaceService
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+<div class="map-page">
+    <h1>Parking Map</h1>
+
+    @if (spaces == null)
+    {
+        <div class="loading">Loading parking map...</div>
+    }
+    else
+    {
+        <div class="map-legend">
+            <div class="legend-item"><span class="legend-dot free"></span> Free</div>
+            <div class="legend-item"><span class="legend-dot occupied"></span> Occupied</div>
+            <div class="legend-item"><span class="legend-dot reserved"></span> Reserved</div>
+            <div class="legend-item"><span class="legend-dot unknown"></span> Unknown</div>
+        </div>
+
+        <div class="parking-map">
+            @foreach (var row in GetParkingRows())
+            {
+                <div class="map-row">
+                    @foreach (var space in row)
+                    {
+                        <div class="parking-space @GetStatusClass(space.Status)"
+                             @onclick="() => GoToSpaceDetails(space.Id)"
+                             title="@space.SpaceNumber — @space.Status">
+                            @space.SpaceNumber
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<ParkingSpaceDto>? spaces;
+    private const int SpacesPerRow = 6;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var paginatedData = await ParkingSpaceService.GetAllParkingSpacesAsync(1, 100);
+        if (paginatedData != null)
+        {
+            spaces = paginatedData.Items;
+        }
+    }
+
+    private List<List<ParkingSpaceDto>> GetParkingRows()
+    {
+        if (spaces == null)
+            return new();
+
+        var rows = new List<List<ParkingSpaceDto>>();
+        for (int i = 0; i < spaces.Count; i += SpacesPerRow)
+        {
+            rows.Add(spaces.Skip(i).Take(SpacesPerRow).ToList());
+        }
+        return rows;
+    }
+
+    private string GetStatusClass(string status) => status.ToLower() switch
+    {
+        "free" => "free",
+        "occupied" => "occupied",
+        "reserved" => "reserved",
+        _ => "unknown"
+    };
+
+    private void GoToSpaceDetails(Guid id)
+    {
+        Navigation.NavigateTo($"/space/{id}");
+    }
+}

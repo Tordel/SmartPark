@@ -1,0 +1,74 @@
+﻿@using SmartPark.Frontend.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+
+<div class="nav-logo">
+    <div class="nav-logo-text">Smart<span>Park</span></div>
+    <div class="nav-logo-sub">Management System</div>
+</div>
+
+<nav>
+    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+        Dashboard
+    </NavLink>
+    <NavLink class="nav-link" href="/spaces">
+        Spaces
+    </NavLink>
+    <NavLink class="nav-link" href="/map">
+        Map
+    </NavLink>
+
+    @if (AuthService.IsAuthenticated)
+    {
+        <NavLink class="nav-link" href="/reservations">
+            My Reservations
+        </NavLink>
+    }
+
+    @if (AuthService.IsAdmin)
+    {
+        <NavLink class="nav-link" href="/admin">
+            Admin
+        </NavLink>
+    }
+</nav>
+
+<div class="nav-user">
+    @if (AuthService.IsAuthenticated)
+    {
+        <div class="nav-user-name">@AuthService.CurrentUser!.Username</div>
+        <div class="nav-user-role">@AuthService.CurrentUser.Role</div>
+        <button class="btn-logout" @onclick="Logout">Sign Out</button>
+    }
+    else
+    {
+        <NavLink class="nav-link" href="/login" style="margin:0;">
+            Sign In
+        </NavLink>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthService.OnAuthStateChanged += OnAuthChanged;
+    }
+
+    private void OnAuthChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnAuthStateChanged -= OnAuthChanged;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        Navigation.NavigateTo("/login");
+    }
+}

@@ -1,0 +1,26 @@
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\bin\Debug\net10.0\SmartPark.Domain.deps.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\bin\Debug\net10.0\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\bin\Debug\net10.0\SmartPark.Domain.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.csproj.AssemblyReference.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.AssemblyInfoInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.AssemblyInfo.cs
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.sourcelink.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\refint\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Domain\obj\Debug\net10.0\ref\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\bin\Debug\net10.0\SmartPark.Domain.deps.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\bin\Debug\net10.0\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\bin\Debug\net10.0\SmartPark.Domain.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.csproj.AssemblyReference.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.AssemblyInfoInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.AssemblyInfo.cs
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.sourcelink.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\refint\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\SmartPark.Domain.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Domain\obj\Debug\net10.0\ref\SmartPark.Domain.dll

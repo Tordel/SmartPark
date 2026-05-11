@@ -1,0 +1,117 @@
+@page "/space/{id:guid}"
+@using Microsoft.AspNetCore.Authorization
+@using SmartPark.Frontend.Models
+@using SmartPark.Frontend.Services
+@inject ParkingSpaceService ParkingSpaceService
+@inject ReservationService ReservationService
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+<div class="space-details-page">
+    <button @onclick="GoBack" class="btn-back">← Back</button>
+
+    @if (space == null)
+    {
+        <div class="loading">Loading space details...</div>
+    }
+    else
+    {
+        <div class="space-header">
+            <h1>@space.SpaceNumber</h1>
+            <div class="space-status-badge @GetStatusClass(space.Status)">@space.Status</div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-card">
+                <h3>Status</h3>
+                <p>@space.Status</p>
+            </div>
+            <div class="detail-card">
+                <h3>Type</h3>
+                <p>@space.Type</p>
+            </div>
+            <div class="detail-card">
+                <h3>Hourly Rate</h3>
+                <p>@space.HourlyRate RON</p>
+            </div>
+            <div class="detail-card">
+                <h3>Last Detected</h3>
+                <p>@(space.LastDetectedAt == null ? "Never" : space.LastDetectedAt.Value.ToString("dd MMM HH:mm"))</p>
+            </div>
+        </div>
+
+        
+
+        @if (history != null && history.Entries.Any())
+        {
+            <div class="detail-card full-width">
+                <h3>Status History — Last 24 Hours</h3>
+                <div class="history-list">
+                    @foreach (var entry in history.Entries)
+                    {
+                        <div class="history-entry">
+                            <div class="history-status @GetStatusClass(entry.Status)">@entry.Status</div>
+                            <div class="history-time">
+                                @entry.StartTime.ToString("HH:mm") – @(entry.EndTime?.ToString("HH:mm") ?? "now")
+                            </div>
+                            <div class="history-duration">@entry.DurationMinutes min</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (reservations != null && reservations.Any())
+        {
+            <div class="detail-card full-width">
+                <h3>Reservations</h3>
+                <div class="reservations-list">
+                    @foreach (var reservation in reservations)
+                    {
+                        <div class="reservation-item">
+                            <span>@reservation.Interval.Start.ToString("dd MMM HH:mm") → @reservation.Interval.End.ToString("HH:mm")</span>
+                            <div class="reservation-status">@reservation.Status</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private ParkingSpaceDto? space;
+    private ParkingSpaceHistoryDto? history;
+
+    private List<ReservationDto>? reservations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        space = await ParkingSpaceService.GetParkingSpaceByIdAsync(Id);
+
+        if (space != null)
+        {
+            var start = DateTime.UtcNow.AddDays(-1);
+            var end = DateTime.UtcNow;
+
+            history = await ParkingSpaceService.GetParkingSpaceHistoryAsync(Id, start, end);
+            reservations = await ReservationService.GetReservationsByParkingSpaceAsync(Id);
+        }
+    }
+
+    private string GetStatusClass(string status) => status.ToLower() switch
+    {
+        "free" => "free",
+        "occupied" => "occupied",
+        "reserved" => "reserved",
+        _ => "unknown"
+    };
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/spaces");
+    }
+}

@@ -1,0 +1,50 @@
+﻿@using SmartPark.Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<CascadingAuthenticationState>
+    @if (!initialized)
+    {
+        <div class="loading">Loading...</div>
+    }
+    else
+    {
+        <Routes />
+    }
+</CascadingAuthenticationState>
+
+@code {
+    private bool initialized = false;
+    private static readonly string[] PublicRoutes = { "/login" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.InitializeAsync();
+        initialized = true;
+
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath.ToLower();
+        var isPublic = PublicRoutes.Any(r => currentPath.StartsWith(r));
+
+        if (!AuthService.IsAuthenticated && !isPublic)
+        {
+            Navigation.NavigateTo("/login", replace: true);
+        }
+        else if (AuthService.IsAuthenticated && currentPath == "/login")
+        {
+            Navigation.NavigateTo("/", replace: true);
+        }
+
+        AuthService.OnAuthStateChanged += OnAuthChanged;
+    }
+
+    private void OnAuthChanged()
+    {
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath.ToLower();
+        if (!AuthService.IsAuthenticated && currentPath != "/login")
+        {
+            Navigation.NavigateTo("/login", replace: true);
+        }
+        InvokeAsync(StateHasChanged);
+    }
+}

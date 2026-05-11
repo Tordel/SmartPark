@@ -1,0 +1,432 @@
+@page "/admin"
+@using SmartPark.Frontend.Models
+@using SmartPark.Frontend.Services
+@inject AiDetectionService AiDetectionService
+@inject ParkingSpaceService ParkingSpaceService
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+@if (!AuthService.IsAdmin)
+{
+    Navigation.NavigateTo("/", replace: true);
+    return;
+}
+
+<div class="admin-page">
+    <h1>Admin Panel</h1>
+
+    <!-- Tab Navigation -->
+    <div class="admin-tabs">
+        <button class="admin-tab @(activeTab == "spaces" ? "active" : "")" @onclick='() => SetTab("spaces")'>
+            Parking Spaces
+        </button>
+        <button class="admin-tab @(activeTab == "status" ? "active" : "")" @onclick='() => SetTab("status")'>
+            Update Status
+        </button>
+        <button class="admin-tab @(activeTab == "ai" ? "active" : "")" @onclick='() => SetTab("ai")'>
+            AI Detection
+        </button>
+    </div>
+
+    <!-- ── Parking Spaces Tab ── -->
+    @if (activeTab == "spaces")
+    {
+        <div class="admin-section">
+            <div class="section-header">
+                <h2>Parking Spaces</h2>
+                <button class="btn-primary" style="width:auto;padding:0.5rem 1.25rem;"
+                        @onclick="() => showCreateForm = !showCreateForm">
+                    @(showCreateForm ? "Cancel" : "+ Add Space")
+                </button>
+            </div>
+
+            @if (showCreateForm)
+            {
+                <div class="admin-card" style="margin-bottom:1.5rem;">
+                    <h2>New Parking Space</h2>
+                    @if (!string.IsNullOrEmpty(createError))
+                    {
+                        <div class="error-message" style="margin-bottom:1rem;">@createError</div>
+                    }
+                    @if (!string.IsNullOrEmpty(createSuccess))
+                    {
+                        <div class="success-message" style="margin-bottom:1rem;">@createSuccess</div>
+                    }
+                    <div class="admin-form-grid">
+                        <div class="form-group">
+                            <label>Space Number</label>
+                            <input type="text" @bind="newSpaceNumber" placeholder="e.g. A03" />
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select @bind="newSpaceType">
+                                <option value="Standard">Standard</option>
+                                <option value="EV">EV</option>
+                                <option value="Disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Hourly Rate (RON)</label>
+                            <input type="number" @bind="newHourlyRate" min="0" step="0.5" />
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width:auto;padding:0.6rem 1.5rem;"
+                            @onclick="CreateSpace" disabled="@isCreating">
+                        @(isCreating ? "Creating..." : "Create Space")
+                    </button>
+                </div>
+            }
+
+            @if (spaces == null)
+            {
+                <div class="loading">Loading spaces...</div>
+            }
+            else if (!spaces.Items.Any())
+            {
+                <div class="no-data">No parking spaces found.</div>
+            }
+            else
+            {
+                <div class="admin-table">
+                    <div class="admin-table-header">
+                        <span>Number</span>
+                        <span>Type</span>
+                        <span>Status</span>
+                        <span>Rate</span>
+                        <span>Last Detected</span>
+                        <span>Actions</span>
+                    </div>
+                    @foreach (var space in spaces.Items)
+                    {
+                        <div class="admin-table-row">
+                            <span class="admin-table-number">@space.SpaceNumber</span>
+                            <span style="color:var(--color-text-muted);font-size:0.8rem;">@space.Type</span>
+                            <span>
+                                <div class="space-status-badge @GetStatusClass(space.Status)" style="display:inline-block;">
+                                    @space.Status
+                                </div>
+                            </span>
+                            <span style="font-size:0.82rem;">@space.HourlyRate RON/h</span>
+                            <span style="font-size:0.75rem;color:var(--color-text-muted);">
+                                @(space.LastDetectedAt == null ? "Never" : space.LastDetectedAt.Value.ToString("dd MMM HH:mm"))
+                            </span>
+                            <span class="admin-table-actions">
+                                <button class="btn-table-action delete"
+                                        @onclick="() => DeleteSpace(space.Id)"
+                                        disabled="@deletingId == space.Id">
+                                    @(deletingId == space.Id ? "..." : "Delete")
+                                </button>
+                            </span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <!-- ── Status Update Tab ── -->
+    @if (activeTab == "status")
+    {
+        <div class="admin-section">
+            <h2>Update Space Status</h2>
+            <div class="ai-test-container">
+                <div class="test-form">
+                    @if (!string.IsNullOrEmpty(statusError))
+                    {
+                        <div class="error-message" style="margin-bottom:1rem;">@statusError</div>
+                    }
+                    @if (!string.IsNullOrEmpty(statusSuccess))
+                    {
+                        <div class="success-message" style="margin-bottom:1rem;">@statusSuccess</div>
+                    }
+                    <div class="form-group">
+                        <label>Parking Space</label>
+                        <select @bind="statusSpaceId">
+                            <option value="">-- Select Space --</option>
+                            @if (spaces != null)
+                            {
+                                @foreach (var space in spaces.Items)
+                                {
+                                    <option value="@space.Id">@space.SpaceNumber — @space.Status</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>New Status</label>
+                        <select @bind="newStatus">
+                            <option value="Free">Free</option>
+                            <option value="Occupied">Occupied</option>
+                            <option value="Reserved">Reserved</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" @onclick="UpdateStatus" disabled="@isUpdatingStatus">
+                        @(isUpdatingStatus ? "Updating..." : "Update Status")
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ── AI Detection Tab ── -->
+    @if (activeTab == "ai")
+    {
+        <div class="admin-section">
+            <h2>AI Detection Test</h2>
+            <div class="ai-test-container">
+                <div class="test-form">
+                    @if (!string.IsNullOrEmpty(aiError))
+                    {
+                        <div class="error-message" style="margin-bottom:1rem;">@aiError</div>
+                    }
+                    <div class="form-group">
+                        <label>Image Path</label>
+                        <input type="text" @bind="imagePath" placeholder="C:\...\image.jpg" />
+                    </div>
+                    <div class="form-group">
+                        <label>Parking Space</label>
+                        <select @bind="selectedSpaceId">
+                            <option value="">-- Select Space --</option>
+                            @if (spaces != null)
+                            {
+                                @foreach (var space in spaces.Items)
+                                {
+                                    <option value="@space.Id">@space.SpaceNumber</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Threshold</label>
+                        <input type="number" @bind="threshold" min="0" max="1" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label>Polygon Coordinates (JSON)</label>
+                        <textarea @bind="polygonJson" placeholder="[[190,160],[415,160],[540,320],[70,320]]"></textarea>
+                    </div>
+                    <button @onclick="AnalyzeImage" class="btn-primary" disabled="@isAnalyzing">
+                        @(isAnalyzing ? "Analyzing..." : "Analyze")
+                    </button>
+                </div>
+
+                @if (analysisResult != null)
+                {
+                    <div class="test-result">
+                        <h2>Analysis Result</h2>
+                        @foreach (var result in analysisResult.Results)
+                        {
+                            <div class="result-card @GetStatusClass(result.Status)" style="margin-bottom:1rem;">
+                                <div class="result-field">
+                                    <label>Status</label>
+                                    <div class="result-value">@result.Status</div>
+                                </div>
+                                <div class="result-field">
+                                    <label>Confidence</label>
+                                    <div class="result-value">@result.Confidence.ToString("P")</div>
+                                </div>
+                                <div class="result-field">
+                                    <label>Detected At</label>
+                                    <div class="result-value">@result.DetectedAt.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string activeTab = "spaces";
+
+    // Shared
+    private PaginatedParkingSpacesDto? spaces;
+
+    // Spaces tab
+    private bool showCreateForm = false;
+    private string newSpaceNumber = "";
+    private string newSpaceType = "Standard";
+    private decimal newHourlyRate = 3;
+    private bool isCreating = false;
+    private string createError = "";
+    private string createSuccess = "";
+    private Guid? deletingId = null;
+
+    // Status tab
+    private string statusSpaceId = "";
+    private string newStatus = "Free";
+    private bool isUpdatingStatus = false;
+    private string statusError = "";
+    private string statusSuccess = "";
+
+    // AI tab
+    private string imagePath = "";
+    private string selectedSpaceId = "";
+    private double threshold = 0.08;
+    private string polygonJson = "[[190,160],[415,160],[540,320],[70,320]]";
+    private AiDetectionResultDto? analysisResult;
+    private string aiError = "";
+    private bool isAnalyzing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSpaces();
+    }
+
+    private void SetTab(string tab)
+    {
+        activeTab = tab;
+        createError = "";
+        createSuccess = "";
+        statusError = "";
+        statusSuccess = "";
+        aiError = "";
+    }
+
+    private async Task LoadSpaces()
+    {
+        spaces = await ParkingSpaceService.GetAllParkingSpacesAsync(1, 100);
+    }
+
+    // ── Create ──
+    private async Task CreateSpace()
+    {
+        createError = "";
+        createSuccess = "";
+
+        if (string.IsNullOrWhiteSpace(newSpaceNumber))
+        {
+            createError = "Space number is required.";
+            return;
+        }
+
+        isCreating = true;
+
+        var success = await ParkingSpaceService.CreateParkingSpaceAsync(
+            newSpaceNumber, newHourlyRate, newSpaceType);
+
+        if (success)
+        {
+            createSuccess = $"Space {newSpaceNumber} created successfully.";
+            newSpaceNumber = "";
+            newHourlyRate = 3;
+            newSpaceType = "Standard";
+            showCreateForm = false;
+            await LoadSpaces();
+        }
+        else
+        {
+            createError = "Failed to create space. The space number may already exist.";
+        }
+
+        isCreating = false;
+    }
+
+    // ── Delete ──
+    private async Task DeleteSpace(Guid id)
+    {
+        deletingId = id;
+        var success = await ParkingSpaceService.DeleteParkingSpaceAsync(id);
+        if (success)
+            await LoadSpaces();
+        deletingId = null;
+    }
+
+    // ── Status Update ──
+    private async Task UpdateStatus()
+    {
+        statusError = "";
+        statusSuccess = "";
+
+        if (string.IsNullOrEmpty(statusSpaceId))
+        {
+            statusError = "Please select a parking space.";
+            return;
+        }
+
+        isUpdatingStatus = true;
+
+        var success = await ParkingSpaceService.UpdateParkingSpaceStatusAsync(
+            Guid.Parse(statusSpaceId), newStatus);
+
+        if (success)
+        {
+            statusSuccess = "Status updated successfully.";
+            await LoadSpaces();
+        }
+        else
+        {
+            statusError = "Failed to update status.";
+        }
+
+        isUpdatingStatus = false;
+    }
+
+    // ── AI Detection ──
+    private async Task AnalyzeImage()
+    {
+        aiError = "";
+        analysisResult = null;
+
+        if (string.IsNullOrEmpty(imagePath))
+        {
+            aiError = "Please enter an image path.";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(selectedSpaceId) || !Guid.TryParse(selectedSpaceId, out var spaceId))
+        {
+            aiError = "Please select a parking space.";
+            return;
+        }
+
+        var polygon = ParsePolygon(polygonJson);
+        if (polygon == null || polygon.Count == 0)
+        {
+            aiError = "Invalid polygon coordinates.";
+            return;
+        }
+
+        isAnalyzing = true;
+
+        var request = new AiDetectionRequestDto
+        {
+            ImageUrl = imagePath,
+            Threshold = threshold,
+            Source = "manual",
+            Spaces = new List<AiSpaceRegionDto>
+            {
+                new AiSpaceRegionDto
+                {
+                    Id = spaceId,
+                    Name = spaces?.Items.FirstOrDefault(s => s.Id == spaceId)?.SpaceNumber ?? "",
+                    Polygon = polygon
+                }
+            }
+        };
+
+        analysisResult = await AiDetectionService.AnalyzeImageAsync(request);
+        if (analysisResult == null)
+            aiError = "Failed to analyze image.";
+
+        isAnalyzing = false;
+    }
+
+    private List<List<int>>? ParsePolygon(string json)
+    {
+        try
+        {
+            return System.Text.Json.JsonSerializer.Deserialize<List<List<int>>>(json);
+        }
+        catch { return null; }
+    }
+
+    private string GetStatusClass(string status) => status.ToLower() switch
+    {
+        "free" => "free",
+        "occupied" => "occupied",
+        "reserved" => "reserved",
+        _ => "unknown"
+    };
+}

@@ -1,0 +1,100 @@
+@page "/login"
+@layout AuthLayout
+@using Microsoft.AspNetCore.Authorization
+@using SmartPark.Frontend.Layout
+@using SmartPark.Frontend.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@attribute [AllowAnonymous]
+
+<div class="login-page">
+    <div class="login-card">
+        <div class="login-logo">
+            <span class="login-logo-text">Smart<span>Park</span></span>
+            <p class="login-logo-sub">Parking Management System</p>
+        </div>
+
+        <div class="login-tabs">
+            <button class="login-tab @(isLogin ? "active" : "")" @onclick="() => isLogin = true">Sign In</button>
+            <button class="login-tab @(!isLogin ? "active" : "")" @onclick="() => isLogin = false">Register</button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="login-error">@errorMessage</div>
+        }
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="login-success">@successMessage</div>
+        }
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" @bind="username" placeholder="Enter username" />
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" @bind="password" placeholder="Enter password" />
+        </div>
+
+        <button class="btn-primary" @onclick="HandleSubmit" disabled="@isLoading">
+            @(isLoading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account"))
+        </button>
+    </div>
+</div>
+
+@code {
+    private string username = "";
+    private string password = "";
+    private string errorMessage = "";
+    private string successMessage = "";
+    private bool isLoading = false;
+    private bool isLogin = true;
+
+    protected override void OnInitialized()
+    {
+        if (AuthService.IsAuthenticated)
+            Navigation.NavigateTo("/");
+    }
+
+    private async Task HandleSubmit()
+    {
+        errorMessage = "";
+        successMessage = "";
+        isLoading = true;
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Please enter username and password.";
+            isLoading = false;
+            return;
+        }
+
+        if (isLogin)
+        {
+            var success = await AuthService.LoginAsync(username, password);
+            if (success)
+                Navigation.NavigateTo("/");
+            else
+                errorMessage = "Invalid username or password.";
+        }
+        else
+        {
+            var success = await AuthService.RegisterAsync(username, password);
+            if (success)
+            {
+                successMessage = "Account created! Signing you in...";
+                await AuthService.LoginAsync(username, password);
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Username already taken or registration failed.";
+            }
+        }
+
+        isLoading = false;
+    }
+}

@@ -1,0 +1,32 @@
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Application.deps.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Application.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Application.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Domain.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.csproj.AssemblyReference.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.AssemblyInfoInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.AssemblyInfo.cs
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.csproj.CoreCompileInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.sourcelink.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPar.24B566A6.Up2Date
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\refint\SmartPark.Application.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\Solo Project\CampusEats\CampusEats\SmartPark\SmartPark.Application\obj\Debug\net10.0\ref\SmartPark.Application.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Application.deps.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Application.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Application.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Domain.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\bin\Debug\net10.0\SmartPark.Domain.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.csproj.AssemblyReference.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.AssemblyInfoInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.AssemblyInfo.cs
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.csproj.CoreCompileInputs.cache
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.sourcelink.json
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPar.24B566A6.Up2Date
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\refint\SmartPark.Application.dll
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\SmartPark.Application.pdb
+C:\Users\Tudor\Desktop\Facultate\DOTNET\SmartPark\SmartPark.Application\obj\Debug\net10.0\ref\SmartPark.Application.dll
