@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartPark.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7061329f5964e4ad71d6ace13ae83b9cd993ff8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+54abc537e62b76e1d5c0546a43cf5a11cba8f056")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartPark.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartPark.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
