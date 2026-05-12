@@ -1,2 +1,86 @@
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# JETBRAINS (Rider / PyCharm)
+# =========================
+.idea/
+*.iml
+
+# =========================
+# .NET / C#
+# =========================
+
+# Build output
 bin/
 obj/
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+
+# NuGet
+*.nupkg
+packages/
+
+# Publish output
+publish/
+
+# User-specific files
+*.user
+*.rsuser
+*.sln.docstates
+
+# =========================
+# BLAZOR WEBASSEMBLY
+# =========================
+
+# Generated files
+wwwroot/_framework/
+
+# =========================
+# PYTHON (ai-service)
+# =========================
+
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Packaging
+dist/
+build/
+*.egg-info/
+
+# PyCharm
+.idea/
+
+# Environment variables / secrets
+.env
+.env.*
+
+# pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# =========================
+# SECRETS
+# =========================
+
+appsettings.Development.json
+secrets.json
+
+# Certificates / keys
+*.pfx
+*.pem
+*.key
