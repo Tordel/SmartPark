@@ -40,7 +40,7 @@ public class ParkingSpace
         };
     }
 
-
+    // Makes a reservation on this parking space
     public void Reserve(Reservation reservation)
     {
         if (Status == ParkingSpaceStatus.Occupied)
