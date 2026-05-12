@@ -119,7 +119,9 @@ public class AiOccupancyController(IMediator mediator, IConfiguration configurat
 }
 
 public record AiOccupancyUpdateRequest(
+    [property: JsonRequired]
     Guid Id,
+    [property: JsonRequired]
     ParkingSpaceStatus NewStatus,
     DateTime? DetectedAt,
     decimal? Confidence,
@@ -127,7 +129,7 @@ public record AiOccupancyUpdateRequest(
     );
 
 public record AiOccupancyBatchRequest(
-    DateTime DetectedAt,
+    DateTime? DetectedAt,
     string? Source,
     List<AiOccupancyBatchItem> Detections
     );
